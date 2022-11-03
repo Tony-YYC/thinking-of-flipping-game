@@ -1,23 +1,91 @@
 \documentclass[UTF-8,a4paper]{ctexart}
 \usepackage{amsmath,amsfonts}
-\usepackage{CJKutf8}
-\usepackage{algorithmic}
-\usepackage{algorithm}
-\usepackage{array}
-\usepackage[caption=false,font=normalsize,labelfont=sf,textfont=sf]{subfig}
-\usepackage{textcomp}
-\usepackage{stfloats}
-\usepackage{url}
-\usepackage{verbatim}
-\usepackage{graphicx}
-\usepackage{cite}
+
 %title
 \begin{document}
-\title{Flipping game under the perspective of Linear Algebra}
+\title{Flipping game under the perspective of Linear Algebra\\寻找变化中的不变量}
 \author{\kaishu 俞奕成}
 \date{\kaishu \today}
 \maketitle
 %contents
 \setcounter{tocdepth}{2}
 \tableofcontents
+\newpage
+
+\part{Introduction}
+\section{开端：2阶翻棋游戏的具体描述}
+问题的开始是一个简单的二阶翻棋游戏：\par
+初始状况：\par
+\kaishu 在\(2 \times 2\)的棋盘上，随机放置着一些棋子，这些棋子一面是黑色，一面是白色，向上面的颜色完全随机 \par
+\songti 允许对这些棋子进行如下操作：\par
+\kaishu 每次选中一列或者一行棋子，将这一列或者一行棋子全部翻转。\par
+\songti 游戏要求的最终结果：\par
+\kaishu 如果有可能，在进行若干次操作之后，棋盘上的棋子变为全部黑色向上或全部白色向上。\par
+\songti 游戏的解法：\par
+\kaishu 一系列允许的操作，使得初始情况经过这些操作后变为最终结果 \par
+\songti 注意：\par
+\kaishu 并不是所有棋盘都有可能达到最终要求，部分初始状况在操作后是不可能达到最终要求的
+\section{问题的提出}
+\songti 对于这个翻棋游戏，不难提出如下问题:
+\kaishu
+\begin{enumerate}
+    \item 有没有方法，在给出任意一种棋盘的初始状况后，快速的判断出该棋盘是否有可能达到要求的结果（向上面全黑或全白）？
+    \item 有没有方法，对于给出的任意一种棋盘的初始状况，如果有可能达到要求结果，都能找出一种能该游戏的解法？
+\end{enumerate}
+
+\section{过程和问题的抽象化}
+\songti
+棋盘，黑棋子，白棋子显然不利于我们以线性代数的方式来思考问题。所以，我们应该借助线性代数的概念将问题抽象化： 
+\kaishu
+\\定义棋盘为一个\(2 \times 2\)的矩阵：
+\[\begin{pmatrix}
+    a_{11}&a_{12}\\
+    a_{21}&a_{22}\\
+\end{pmatrix}\]
+\quad
+定义：白棋子为\(1\)，黑棋子为\(-1\)
+\\允许的操作也可以对应到矩阵的变换：将某一行（列）的元素全部乘以\(1\)或者\(-1\)
+\\不难发现这个操作就是矩阵的一种初等行（列）变换
+\\游戏的要求——最终变为全黑或者全白，也可以对应到元素全为\(-1\)或者元素全为\(1\)的矩阵，即\\
+\begin{center}
+\(\begin{pmatrix}
+    -1&-1\\
+    -1&-1\\
+\end{pmatrix}\)
+\quad
+(全黑)
+\(\begin{pmatrix}
+    1&1\\
+    1&1\\
+\end{pmatrix}\)
+\quad
+(全白)
+\end{center}
+
+
+\section{具体问题的扩展}
+只要将翻棋游戏的定义中\(2 \times 2\)棋盘改为\(n \times n\)棋盘，而其他定义不变，翻棋游戏的规则就可以很容易地扩展到\(n \times n\)的棋盘上。 \\
+两个问题在\(n \times n\)棋盘的情况下仍然存在并且可以讨论。
+\section{抽象定义的扩展}
+只需将\(2 \times 2\)的矩阵扩展为\(n \times n\)的矩阵：
+\[\begin{pmatrix}
+    a_{11}&a_{12}&\dots&a_{1n}
+    \\a_{21}&a_{22}&\dots&a_{2n}
+    \\ \vdots &\vdots &\vdots &\vdots
+    \\a_{n1}&a_{n2}&\dots&a_{nn}
+\end{pmatrix}\]
+游戏要求的最终结果也进行对应扩展：
+\[\begin{pmatrix}
+    1&1&\dots&1
+    \\1&1&\dots&1
+    \\ \vdots &\vdots &\vdots &\vdots
+    \\1&1&\dots&1
+\end{pmatrix}\]
+\\其余定义不变，即可将抽象定义扩展到\(n \times n\)
+
+\part{初始简单情况的规律与分析}
+\songti 先从
+\part{使用线性代数的方式分析该问题}
+\part{一般化情况的分析与思考}
+\part{该类问题一般解法的实现与分析}
 \end{document}
