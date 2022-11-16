@@ -1,5 +1,8 @@
 \documentclass[UTF-8,a4paper]{ctexart}
 \usepackage{amsmath,amsfonts}
+\newtheorem{definition}[subsubsection]{定义}
+\newtheorem{theorem}[subsubsection]{定理}
+\newtheorem{property}[subsubsection]{性质}
 
 %title
 \begin{document}
@@ -175,14 +178,77 @@
 \songti
 \part{一般化情况的分析与思考}
 \section{判断标准:矩阵的秩为1}
+\subsection{推断，猜想和尝试}
 前面已经提到了猜想，秩为1是很有可能是一个正确的判断方法。
 我们可以列举几个高阶情况，发现这个标准都是正确的。
-由于变换（操作）过程中矩阵的秩不变，我们希望寻找变化中的不变，这样易于解决问题。因此对于不变的最终结果——全黑或者全白矩阵进行分析，我们发现这两个矩阵的秩可能等于1。
-下面给出简易证明：
+由于变换（操作）过程中矩阵的秩不变，我们希望寻找变化中的不变，这样易于解决问题。
+\\因此对于不变的最终结果——全黑或者全白矩阵进行分析，我们发现这两个矩阵的秩可能等于1。
+\\于是，下面给出简易证明：
+\subsection{最终结果矩阵秩为1的证明}
+\kaishu
+由定义可知，在表示全黑（全白）棋盘的\(n \times n\)矩阵\(\mathbf{A}=(a_{ij})_{n \times n}\)中，
+\\有\(\forall i,j , a_{ij}=1(or -1) \)
+\\从中任意取出一个元素\(a_{ij}\)，即为该矩阵的一阶子式，显然\(a_{ij} \neq 0\)，因此存在不为零的一阶子式
+\\另一方面，矩阵\(\mathbf{A}\)中\(\forall\)二阶子式\(\begin{vmatrix}
+    a_{ij}&a_{in}
+    \\a_{mj}&a_{mn}
+\end{vmatrix}\)，有
+\[\begin{vmatrix}
+    a_{ij}&a_{in}
+    \\a_{mj}&a_{mn}
+\end{vmatrix}=a_{ij}a_{mn}-a_{in}a_{mj}=1-1=0\]
+故由矩阵秩的定义，可知全黑或全白矩阵\(r(\mathbf{A})=1\)
 
-\section{寻找更直观的判断方式}
+
+\subsection{判断标准必要性证明}
+\songti 在已经证明最终结果矩阵秩为1的基础上，容易证明判断标准的必要性：
+\kaishu
+\\翻棋操作是一种初等变换，而初等变换不会改变矩阵的秩
+\\ \(\Rightarrow\)任意次允许的操作都不会改变矩阵的秩
+\\\(\Rightarrow\)如果给定的一个初始情况棋盘对应的\(n \times n\)矩阵\(\mathbf{M}\)经过若干次允许的操作能够化为全黑或全白矩阵\(\mathbf{A}\)，则必有\(r(\mathbf{M})=1\)
+\\即\quad一个棋盘能化为全黑或全白\(\Rightarrow\)对应矩阵的秩\(r(\mathbf{M})=1\)
+
+\subsection{判断标准充分性证明}
+\songti
+上述证明过程尚不足以说明秩为1这个判断标准的充分性。我们先明确充分性问题：
+\kaishu
+\\分析：
+\\ \(\forall\)一个\(r(\mathbf{M})=1\)的\(n \times n\)初始情况矩阵\(\mathbf{M}\)
+\\证明：它可以经过若干次\(-1c_i\)和\(-1r_i\)初等变换，化为全1或全-1矩阵
+\\ \songti 经过线性代数的学习，我们知道初等变换\(-1r_i\)等价于左乘初等矩阵\(E(i(-1))\)，初等变换\(-1c_i\)等价于右乘初等矩阵\(E(i(-1))\)
+\\于是，可以进一步从矩阵的角度来描述这个问题：
+\kaishu
+\\存在\(n \times n\)矩阵\(\mathbf{P}, \mathbf{Q},s.t. \mathbf{P}\mathbf{M}\mathbf{Q}=\mathbf{A}\)
+其中\[\mathbf{P},\mathbf{Q}=\begin{pmatrix}
+    a_{11}
+    \\&a_{22}
+    \\&& \ddots
+    \\ &&& a_{nn}
+\end{pmatrix} \quad
+a_{ii}= 1\,or\,-1 \quad
+i = 1,2,\dots,n
+\]
+\(\mathbf{M}\)为棋盘初始情况对应的\(n \times n\)矩阵
+\\\(\mathbf{A}\)为全黑或全白的棋盘最终结果对应的\(n \times n\)矩阵
+\songti
+\\然而，接下来，我们发现这个问题似乎难以从矩阵角度继续分析或者得出更多的结论了。
+\\其实上面这个命题一共对应了有限的\(2^{2n}\)种情况。如果在有计算机辅助的情况下进行枚举，最终可以找出可行情况，将可行情况中的\(\mathbf{P},\mathbf{Q}\)还原成对应的行变换和列变换，再还原为允许的操作，就找出解法了。
+\\然而这种的时间复杂度为\(\mathbf{O}(2^n)\)，这是很高的一个时间复杂度，而且它过于暴力，很不数学，至少很不线性代数。
+\\所以，我们考虑换个角度看问题，找到更多变化中的不变，引入了线性代数中和矩阵十分相关的概念——向量组。
+\kaishu
+\\线性代数中，有关向量组和矩阵的秩的关系，有如下定理:
+\begin{theorem}
+    \label{vectorR}
+    设\(\mathbf{A}\)是\(m \times n\)矩阵，\\则\(\mathbf{A}\)的列向量组\(\alpha_1,\alpha_2,\dots,\alpha_n\)的秩等于矩阵\(\mathbf{A}\)的秩，
+    \\ \(\mathbf{A}\)的行向量组的秩也等于\(\mathbf{A}\)的秩
+\end{theorem}
+
+
+\section{推论：更直观的判断标准}
+\songti
 但是，当矩阵的阶数很高的时候，想要快速的求出一个没有规律的矩阵的秩，或者得知它的秩是否是1是相当复杂而耗时的。
-于是我们考虑换个角度，引入线性代数中和矩阵十分相关的概念——向量组。
+
+
 \section{找出一般化解答方法}
 
 \part{该类问题一般解法的实现与分析}
