@@ -1,5 +1,6 @@
 \documentclass[UTF-8,a4paper]{ctexart}
 \usepackage{amsmath,amsfonts}
+\usepackage{hyperref}
 \newtheorem{definition}[subsubsection]{定义}
 \newtheorem{theorem}[subsubsection]{定理}
 \newtheorem{property}[subsubsection]{性质}
@@ -276,14 +277,145 @@ i = 1,2,\dots,n
     \\\(\mathbf{M}=\alpha_1,\alpha_2,\dots,\alpha_n\)，
     \\有\(\alpha_i = k \alpha_1 \quad i=2,\dots,n \quad k = 1\, or\, -1\)
 \end{property}
+\songti
 从直观上来看，就是这个矩阵的所有列的对应位置的元素成比例
 \\这是非常容易在直观上感受或判断的。我们也就得到了一种快速直观的判断翻棋游戏是否可解的方法。
 
 \section{快速简洁的一般化解答方法}
 其实充分性论证的过程就是给出了一种标准化解答方法，此处不再重复。
 
-
+\section{进一步推广到\(m \times n\)矩阵}
+发现以上关于\(n \times n\)矩阵的判断标准：
+\kaishu
+\begin{enumerate}
+    \item 具有充要性的判断标准：秩为1
+    \item 具有充要行的快速直观判断标准：列向量对应成比例
+\end{enumerate}
+\songti
+可以直接推广到\(m \times n\)矩阵
+\\关于充分性和必要性的证明都可以直接推广，此处不再赘述。
+\\也就是说，我们推得的判断标准能适用于任意行数，列数的矩阵了。
 \part{该类问题一般解法的实现与分析}
-\section{回顾解决翻棋游戏的过程：对线性代数中不变量的思考}
-\section{关于其他学科及生活中不变量的思考}
+前面的证明可能不太直观，我们使用程序给出一种标准的解法，更直观一些：
+\\为了节约时间，我们使用python来解决这个问题，且使用numpy库来存储和处理矩阵。
+\\我们规定输入为：
+\kaishu
+\begin{description}
+    \item[第一行]目标结果是全白棋盘还是全黑棋盘 
+    \item[第二行]矩阵的尺寸\(m \times n\)，逗号分隔
+    \item[之后的行]按行输入矩阵，逗号分隔元素
+\end{description}
+例如:
+\begin{verbatim}
+To reach All black input -1, All white 1:-1
+Please input the size of your chessboard in rows,lines:2,2
+Please input line 0 split by , :1,1
+Please input line 1 split by , :-1,-1
+\end{verbatim}
+\songti
+输出为：
+\kaishu
+\\若有解，输出一个字符串列表，它是翻棋游戏的解
+例如：
+\begin{verbatim}
+    ['r1']
+\end{verbatim}
+或者
+\begin{verbatim}
+    ['c1', 'c2', 'r2']
+\end{verbatim}
+其中每个元素为ri或ci(i为一个数字)，分别代表对i行或i列做一次翻转
+\\做完列表中的所有操作，就可以得到目标的全黑或全白棋盘
+\\若无解，输出"NOANSWER"
+\songti
+\\程序大致分为几个部分:
+\begin{verbatim}
+    c = chessGame(type)
+    c.input()
+    c.columnMatch()
+    c.rowMatch()
+    c.output()
+\end{verbatim}
+然后以下是对于每个部分的实现：
+\begin{verbatim}
+    class chessGame():
+    def __init__(self,type):
+        self.solutionStatus = 1
+        self.solution = []
+        self.type=type
+
+    def input(self):
+        self.m,self.n = map(int,input("Please input the size of your chessboard in rows,lines:").split(","))
+        matrixList = []
+        for i in range(0,self.m):
+            rowList = input("Please input line " + str(i+1) + " split by , :").split(",")
+            rowList = list(map(int,rowList))
+            matrixList.append(rowList)
+        #print(matrixList)
+        self.M = np.matrix(matrixList)
+
+    def columnMatch(self):
+        for j in range(0,self.n):
+            sign = self.M[0,j] / self.M[0,0]
+            for p in range(0,self.m):
+                if self.M[p,j] / self.M[p,0] == sign:
+                    continue;
+                else:
+                    self.solutionStatus = 0
+                    break
+            if(self.solutionStatus == 1) and (sign == -1):
+                operation = "c" + str(j+1)
+                self.solution.append(operation)
+    
+    def rowMatch(self):
+        if self.solutionStatus:
+            for i in range(0,self.m):
+                if self.M[i,0] == -self.type:
+                    operation = "r" + str(i+1)
+                    #print(operation)
+                    self.solution.append(operation)
+
+    def output(self):
+        if self.solutionStatus:
+            print(self.solution)
+        else:
+            print("NOANSWER")
+\end{verbatim}
+能够按照要求运行的完整版本源代码在solution.py中，已经open source在
+\\ \url{http://59.78.35.247:3000/TonyYYC/Flipping-Game}
+\\校内使用gitea自行搭建的git服务器，请使用sjtu内网或连接校园vpn访问
+\\ 技术所限，连接不稳定或无法访问的情况，敬请谅解
+\\如有bug，可以在gitea的页面上直接提issue
+
+\part{回顾解决翻棋游戏的过程：对线性代数中不变量的思考}
+\section{不变量——矩阵与向量组中的秩}
+翻棋游戏的解决过程一直围绕着线性代数中一个核心的不变量——秩来进行。矩阵的秩在初等变换中具有不变性，也就是在左乘或右乘初等矩阵（相当于初等变换）中具有不变性。
+\\而且这种秩的不变性并不局限于矩阵之中，它和向量组的秩是相等的，故在对向量组进进行与矩阵的初等变换等效的操作时，向量组的秩是不会变的。
+\\这些操作包括：
+\kaishu
+\begin{enumerate}
+    \item 将向量组中某个向量乘以非零常数
+    \item 将一个向量的k倍加到另一个向量上
+    \item 将两个向量调换位置
+\end{enumerate}
+\songti
+而向量组的秩是其极大线性无关组中的向量个数，结合向量组秩的定义，我们可以推出有关向量组的线性相关性和是否能线性表示（两者在其实是等价的）的特性
+\\而这些特性可以为我们解决特定问题提供支持。
+\section{从特殊到一般，从具象到抽象}
+从以上的过程中我们可以看到秩的不变性具有很多用处。但是正如这篇文章所做的，在思考的时候，在某有任何铺垫的情况下直接利用秩去解释一个新的问题，其实相当困难。
+\\毕竟一般化问题本身往往就很复杂，而秩这种特性其实很抽象，不好直观理解，如果直接用抽象的工具去解决一般化问题，往往手足无措。
+\\所以，我们可以先从特殊的，简单的问题开始，从具象的问题开始，例如本文先从\(2 \times 2\)的矩阵开始，尝试寻找一些直观的性质，再尝试推广到\(n \times n\)，按需引入抽象化工具。
+\\有了在特殊和具象的情况下的直观理解，后续解决一般化，抽象的问题的过程，会顺利很多。
+
+\part{关于其他学科及生活中不变量的思考}
+    正如寻找和利用线性代数的不变量——秩是这篇文章解决翻棋游戏的核心一样，寻找和利用不变量无论在其他学科还是在生活中都是解决问题的关键。
+    \\以下列举几个我能想到的例子。由于这是一个线性代数的文章，以下只进行简述，具体内容可以由读者自行展开：
+    \kaishu
+    \begin{enumerate}
+        \item 我们的无机化学中充满着不变量的思想，常用溶液中的质子守恒去写质子平衡式，氧化还原中的得失电子守恒去推导反应方程式中各物质的系数比，解决各种复杂的定量计算问题，这其实就是不变量思想，抓住并充分利用了反应过程中的不变量——质子的传递和电子的得失
+        \item 在分析化学中，我们利用上述无机化学的概念，建立了一套基于“基本反应单元”的计算方法，进一步将上面的不变量抽象化，让计算更快，步骤更少更简便。
+        \item 这种建立抽象概念来简化，分析复杂问题的办法，与线性代数中建立秩，极大线性无关组，标准型等等将矩阵，向量组的性质抽象出来的概念，以及建立抽象性更高的线性空间，维数，坐标等等概念，不无相似之处。
+        \item 程序设计，尤其是在进行较大规模的软件工程设计的时候，会采用一种面向对象的设计方式，在大量的，复杂的不同类型的需求中先分类，再在每个类别中抽象出几个能够复用的逻辑，几个重要的变量，这些东西在复杂需求实现的过程中是不变的，然后我们将每个类别都建立一个类，再在每个类中声明这些抽象的逻辑，变量，把整个框架搭好，然后再去具体实现这些抽象的object。虽然这个过程可能和线性代数的概念关系不大，但它其实也是在寻找变化中的不变，而这些object其实就是抽象程度更高的一种“不变量”吧。这样先从变化中找不变，建立不变的抽象化概念和框架，再具体实现的基本思路其实对于工程，无论是什么类型的工程，都有很好的作用，因为正如我们在思考理论问题时的情况一样，它也能够简化复杂的工程问题，同时天生具有“低耦合”的特性，避免不必要的重复步骤，提高效率。其实上面解决这个翻棋游戏的程序虽然规模不大，但也较为浅显地运用了这样的思想，先抽象出几个步骤，再去具体的实现某个步骤。
+        \item 更多的例子，此处不再赘述，留下一些空间，供读者自行类比，思考……
+    \end{enumerate}
 \end{document}
